@@ -1,0 +1,23 @@
+version: "3"
+
+services:
+  registry:
+    image: registry
+    container_name: registry
+    restart: always
+    ports:
+      - 5000:5000
+    volumes:
+      - /var/data/registry:/var/lib/registry
+    networks:
+      - registry-net
+
+
+networks:
+  registry-net:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.30.8.4/30
+

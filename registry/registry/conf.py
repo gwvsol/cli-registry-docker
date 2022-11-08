@@ -19,8 +19,8 @@ conf = ConfigUrl()
 class ClickHelp:
     help: str = "Справка по работе с приложением"
     repo: str = "Информация о репозиториях Registry"
-    info: str = "Информация о репозитории"
-    delete: str = "Удаление образа Docker"
+    info: str = "Информация об образах Docker в Registry"
+    delete: str = "Удаление образа Docker в Registry"
     ssl: str = "Поддержка шифрования"
     host: str = "IP адрес Registry"
     port: str = "Порт Registry"

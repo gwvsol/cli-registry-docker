@@ -56,9 +56,5 @@ def delete(ssl, host, port, repo, tag) -> None:
     _deleting_image(ssl, host, port, repo, tag)
 
 
-def main():
-    registry()
-
-
 if __name__ == '__main__':
-    main()
+    registry()

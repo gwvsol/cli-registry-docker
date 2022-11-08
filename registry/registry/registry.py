@@ -123,7 +123,7 @@ def _info_repo(ssl, host, port, repo):
 def _info_repos(ssl: bool, host: str, port: int, repo: str):
     """ Информация репозиториев  """
     color: Color = Color.Turquoise4
-    click.echo("\t\t\033[38;5;{}m repository =>\033[0;0m" .format(
+    click.echo("\t\t\033[38;5;{}m images =>\033[0;0m" .format(
         color.value)
         )
     if repo == '':

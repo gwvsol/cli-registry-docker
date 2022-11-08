@@ -26,7 +26,8 @@ setup(
     author_email=module.__email__,
     license=module.__license__,
     description=module.__doc__,
-    long_description=open('README.md').read(),
+    long_description=module.__doc__,
+    # long_description=open('README.md').read(),
     # url='https://github.com/***/***',
     platforms='all',
     classifiers=[
@@ -35,15 +36,16 @@ setup(
         'Operating System :: POSIX',
         'Programming Language :: Python',
         'Programming Language :: Python :: 3',
+        'Programming Language :: Python :: 3.6',
         'Programming Language :: Python :: 3.8'
     ],
-    python_requires='>=3.8',
+    python_requires='>=3.6',
     packages=find_packages(),
     install_requires=load_requirements('requirements.txt'),
     include_package_data=True,
     entry_points={
         'console_scripts': [
-            '{0} = {0}.__main__:main'.format(module_name)
+            '{0} = {0}.__main__:registry'.format(module_name)
         ]
     }
 )

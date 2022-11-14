@@ -34,7 +34,14 @@ docker pull 192.168.62.148:5000/robotisk:2022-10-14-01
 
 curl -s https://techvsolregistry.svc.1ckab.ru/v2/amiclient/tags/list | jq '.'
 
-```   
+```    
+
+```url
+https://techvsolregistry.svc.1ckab.ru   
+https://registry.1ckab.ru/    
+user: str = 'kab'   
+passwd: str = 'Let90nc23'  
+```
 
 ```shell
 curl http://192.168.62.148:5000/v2/_catalog | jq '.'     

@@ -11,6 +11,8 @@ class ConfigUrl:
         'Accept': 'application/vnd.docker.distribution.manifest.v2+json'
         }
     timeout: int = 3
+    user: str = 'kab'
+    passwd: str = 'Let90nc23'
 
 
 conf = ConfigUrl()
@@ -24,6 +26,8 @@ class ClickHelp:
     ssl: str = "Поддержка шифрования"
     host: str = "IP адрес Registry"
     port: str = "Порт Registry"
+    user: str = "Имя пользователя"
+    passwd: str = "Пароль"
 
 
 _help = ClickHelp()

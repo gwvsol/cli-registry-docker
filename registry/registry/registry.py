@@ -1,5 +1,6 @@
 import click
 import requests
+from requests.auth import HTTPBasicAuth
 from collections import namedtuple
 from urllib.parse import urlunparse
 
@@ -12,19 +13,23 @@ Components = namedtuple(
 )
 
 
-def registry_requests(method: str, url: str, headers: dict = None) -> dict:
+def registry_requests(method: str, url: str,
+                      auth: HTTPBasicAuth, headers: dict = None) -> dict:
     """ Отправка данных в API REGISTRY """
     try:
         if method == "get":
             if headers:
                 response = requests.get(url,
                                         timeout=conf.timeout,
-                                        headers=headers)
+                                        headers=headers,
+                                        auth=auth)
             else:
                 response = requests.get(url,
-                                        timeout=conf.timeout)
+                                        timeout=conf.timeout,
+                                        auth=auth)
         elif method == "delete":
-            response = requests.delete(url, timeout=conf.timeout)
+            response = requests.delete(url, timeout=conf.timeout,
+                                       auth=auth)
         else:
             return dict(error='req_method error')
 
@@ -54,7 +59,7 @@ def check_scheme(ssl: bool, host: str, port: int) -> tuple:
     return scheme, netloc
 
 
-def _repo(ssl: bool, host: str, port: int, log: bool = True) -> list:
+def _repo(ssl: bool, host: str, port: int, auth: HTTPBasicAuth, log: bool = True) -> list:
     """ Информация о репозиториях  """
     scheme, netloc = check_scheme(ssl, host, port)
     url = urlunparse(
@@ -67,7 +72,7 @@ def _repo(ssl: bool, host: str, port: int, log: bool = True) -> list:
             fragment=''
         )
     )
-    repo: dict = registry_requests(method="get", url=url)
+    repo: dict = registry_requests(method="get", url=url, auth=auth)
     status_code = repo.get('status_code', None)
     data: dict = repo.get('data', dict())
     color: Color = Color.Turquoise4
@@ -89,7 +94,7 @@ def _repo(ssl: bool, host: str, port: int, log: bool = True) -> list:
     return repositories
 
 
-def _info_repo(ssl, host, port, repo):
+def _info_repo(ssl, host, port, repo, auth: HTTPBasicAuth):
     """ Информация репозитория  """
     scheme, netloc = check_scheme(ssl, host, port)
     url = urlunparse(
@@ -102,7 +107,7 @@ def _info_repo(ssl, host, port, repo):
             fragment=''
         )
     )
-    info: dict = registry_requests(method="get", url=url)
+    info: dict = registry_requests(method="get", url=url, auth=auth)
     color: Color = Color.Blue
     status_code = info.get('status_code', None)
     if status_code != requests.codes['ok']:
@@ -120,22 +125,23 @@ def _info_repo(ssl, host, port, repo):
                 )
 
 
-def _info_repos(ssl: bool, host: str, port: int, repo: str):
+def _info_repos(ssl: bool, host: str, port: int, repo: str, auth: HTTPBasicAuth):
     """ Информация репозиториев  """
     color: Color = Color.Turquoise4
     click.echo("\t\t\033[38;5;{}m images =>\033[0;0m" .format(
         color.value)
         )
     if repo == '':
-        repositories = _repo(ssl, host, port, log=False)
+        repositories = _repo(ssl, host, port, auth=auth, log=False)
         if len(repositories) > 0:
             for repository in repositories:
-                _info_repo(ssl, host, port, repository)
+                _info_repo(ssl, host, port, repository, auth)
     else:
         _info_repo(ssl, host, port, repo)
 
 
-def _deleting_image(ssl: bool, host: str, port: int, repo: str, tag: str):
+def _deleting_image(ssl: bool, host: str,
+                    port: int, repo: str, tag: str, auth: HTTPBasicAuth):
     """ Удаление из репозитория образа Docker  """
     scheme, netloc = check_scheme(ssl, host, port)
     url = urlunparse(
@@ -150,7 +156,8 @@ def _deleting_image(ssl: bool, host: str, port: int, repo: str, tag: str):
     )
     info: dict = registry_requests(method="get",
                                    url=url,
-                                   headers=conf.headers)
+                                   headers=conf.headers,
+                                   auth=auth)
 
     status_code = info.get('status_code', None)
     if status_code != requests.codes['ok']:
@@ -180,7 +187,7 @@ def _deleting_image(ssl: bool, host: str, port: int, repo: str, tag: str):
         )
     )
     info: dict = registry_requests(method="delete",
-                                   url=url)
+                                   url=url, auth=auth)
     status_code = info.get('status_code', None)
     if status_code != requests.codes['accepted']:
         color: Color = Color.Blue

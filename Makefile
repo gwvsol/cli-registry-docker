@@ -1,4 +1,4 @@
-#=============================================
+# ===========================================================
 # Общие настройки и переменные
 VENV_NAME?=venv
 VENV_BIN=${VENV_NAME}/bin
@@ -13,19 +13,30 @@ COMPOSE=$(shell which docker-compose)
 export PWD_APP=$(shell pwd)
 export TIMEZONE=$(shell timedatectl status | awk '$$1 == "Time" && $$2 == "zone:" { print $$3 }')
 export USER_ID=$(shell id -u `whoami`)
+# ===========================================================
+# export PYTHON_VERSION=python3.6
+export PYTHON_VERSION=python3
+export SETUP_FILE=setup.py
+export MAKEFILE=Makefile
+export MAKEFILE_DOCKER=Makefile.Docker
+export README=README.md
+export DEPENDENCES=requirements
+export COMPOSEFILE=docker-compose.yml
+export HTPASSWD=.htpasswd
+export ARCHIVE=archive
+export RELEASE=release
+export DIST=dist
+export BUILD=build
 #
-# =============================================
+# ===========================================================
 #
-
-ENV=.env
-export ENVFILE=$(PWD_APP)/${ENV}
-
-ifneq ("$(wildcard $(PWD_APP)/${ENV})","")
-    include ${ENVFILE}
-    export ENVFILE=$(PWD_APP)/${ENV}
-endif
-
-
+# REGISTRY
+export REGISTRY=registry
+export REGISTRY_CLI=registry-cli.py
+export REGISTRY_DIR=/var/data/registry
+export REGISTRY_DEPENDENCES=${REGISTRY}/${DEPENDENCES}
+export REGISTRY_DEPENDENCES_DEV=${REGISTRY}/${DEPENDENCES}-dev.txt
+#
 # ===========================================================
 # ################## Установка REGISTRY #####################
 # ===========================================================
@@ -104,16 +115,16 @@ uninstall:
 clean:
 	@printf "\033[0m"
 	@printf "\033[33m"
-	@echo "==================================== CLEAN ===================================="
+	@echo "===================================== CLEAN ====================================="
 	@[ -d $(RELEASE) ] || mkdir ${RELEASE}
 	@[ -d $(ARCHIVE) ] || mkdir ${ARCHIVE}
 	@[ -d $(DIST) ] || mkdir ${DIST}
-	@find . '(' -path ./${ARCHIVE} -o -path ./${VENV_NAME} ')' -prune -o '(' -name '*.tar.xz' -o -name '*.zip' ')' -type f -exec mv -v -t "$(ARCHIVE)" {} +
-	@find . '(' -path ./${ARCHIVE} -o -path ./${VENV_NAME} ')' -prune -o '(' -name '*.egg-info' -o -name '.eggs' -o -name '*~' -o -name '__pycache__' ')' -exec rm -fr {} +
-	@find . '(' -path ./${ARCHIVE} -o -path ./${VENV_NAME} ')' -prune -o '(' -name '*.pyc' -o -name '*.pyo' -o -name '*.spec' ')' -type f -exec rm {} +
 	@rm -fr ${BUILD}
+	@find . '(' -path ./$(ARCHIVE) -o -path ./${VENV_NAME} ')' -prune -o '(' -name '*.tar.gz' -o -name '*.tar.xz' -o -name '*.zip' ')' -type f -exec mv -v -t "$(ARCHIVE)" {} +
+	@find . '(' -path ./$(ARCHIVE) -o -path ./${VENV_NAME} ')' -prune -o '(' -name '*.egg-info' -o -name '.eggs' -o -name '*~' -o -name '__pycache__' ')' -exec rm -fr {} +
+	@find . '(' -path ./$(ARCHIVE) -o -path ./${VENV_NAME} ')' -prune -o '(' -name '*.pyc' -o -name '*.pyo' -o -name '*.spec' ')' -type f -exec rm {} +
 	@printf "\033[36m"
-	@echo "================================== CLEAN OK! =================================="
+	@echo "=================================== CLEAN OK! ==================================="
 	@printf "\033[0m"
 
 
@@ -142,7 +153,7 @@ release: clean ${DIST} ${README}
 	&& mv ${RELEASE}/${DIST} ${RELEASE}/${REGISTRY} \
 	&& cp -a ${README} ${RELEASE}/${REGISTRY} \
 	&& cd ${RELEASE} \
-	&& zip -r ${REGISTRY}-bin-$(shell date '+%Y-%m-%d-%I-%M-%S').zip ${REGISTRY} \
+	&& tar -cvzf ${REGISTRY}-bin-$(shell date '+%Y-%m-%d-%I-%M-%S').tar.gz ${REGISTRY} \
 	&& rm -fr ${REGISTRY} && cd ..
 	@printf "\033[32m"
 	@echo "============================ CREATE RELEASE BIN OK! ==========================="
@@ -152,13 +163,13 @@ release: clean ${DIST} ${README}
 # =============================================
 # Создание релиза исходного кода REGISTRY
 .PHONY: release-src
-release-src: clean ${REGISTRY} ${MAKEFILE} ${ENVFILE} ${README} ${COMPOSEFILE} \
-			 ${DOCKERFILE} ${REGISTRY_CLI}
+release-src: clean ${REGISTRY} ${MAKEFILE} ${MAKEFILE_DOCKER} ${README} ${COMPOSEFILE} \
+			 ${REGISTRY_CLI} ${HTPASSWD}
 	@printf "\033[0m"
 	@printf "\033[34m"
 	@echo "============================ CREATE RELEASE SRC ==============================="
-	@zip -r ${RELEASE}/${REGISTRY}-src-$(shell date '+%Y-%m-%d-%H-%M-%S').zip \
-	${REGISTRY} ${MAKEFILE} ${ENV} ${README} ${COMPOSEFILE} ${DOCKERFILE} ${REGISTRY_CLI}
+	@tar -cvzf ${RELEASE}/${REGISTRY}-src-$(shell date '+%Y-%m-%d-%H-%M-%S').tar.gz ${HTPASSWD} \
+	${REGISTRY} ${MAKEFILE} ${MAKEFILE_DOCKER} ${README} ${COMPOSEFILE} ${REGISTRY_CLI}
 	@printf "\033[32m"
 	@echo "============================ CREATE RELEASE SRC OK! ==========================="
 	@printf "\033[0m"
@@ -183,6 +194,7 @@ run-registry-repo: ${REGISTRY} ${VENV_NAME}
 
 # Запуск приложения REGISTRY
 .PHONY: run-registry-info
+# run-registry-info: repo?=
 run-registry-info: ${REGISTRY} ${VENV_NAME}
 	@printf "\033[0m"
 	@printf "\033[33m"
@@ -190,6 +202,7 @@ run-registry-info: ${REGISTRY} ${VENV_NAME}
 	@printf "\033[0m"
 #	@${VENV_BIN}/${REGISTRY} info
 #	@${PYTHON} -m ${REGISTRY} info
+#	@${PYTHON} ${REGISTRY_CLI} info --repo $(repo)
 	@${PYTHON} ${REGISTRY_CLI} info
 	@printf "\033[0m"
 	@printf "\033[33m"
@@ -214,6 +227,20 @@ run-registry-delete: ${REGISTRY} ${VENV_NAME}
 	@printf "\033[0m"
 
 
+# Help REGISTRY
+.PHONY: help
+help:
+	@printf "\033[0m"
+	@printf "\033[36m"
+	@echo "================================ HELP REGISTRY ================================"
+	@echo "make run-registry-repo"
+	@echo "make run-registry-info"
+	@echo "make run-registry-delete repo=amiclient tag=2022-10-24-01"
+	@echo "================================ HELP REGISTRY ================================"
+	@printf "\033[0m"
+	@exit 0
+
+
 #===========================================================
 # ################### Сборка приложения ####################
 #===========================================================
@@ -221,11 +248,11 @@ run-registry-delete: ${REGISTRY} ${VENV_NAME}
 # Сборка REGISTRY
 .PHONY: build-registry
 build-registry: ${REGISTRY} ${REGISTRY_CLI}
+	@make uninstall
+	@make install-all
 	@printf "\033[0m"
 	@printf "\033[32m"
 	@echo "================================== BUILD APP =================================="
-	@make uninstall
-	@make install-all
 	@${PYINSTALLER} \
 		--onefile \
 		--windowed \
@@ -239,31 +266,10 @@ build-registry: ${REGISTRY} ${REGISTRY_CLI}
 
 
 # ===========================================================
-# Старт Registry
-start: ${DOCKER} ${COMPOSE_FILE}
-	@${COMPOSE} -f ${COMPOSE_FILE} up -d
 
-
-# Стop Registry
-stop: ${DOCKER} ${COMPOSE_FILE}
-	@${COMPOSE} -f ${COMPOSE_FILE} down
-
-
-# Рестарт Registry
-restart: ${DOCKER} ${COMPOSE} ${COMPOSE_FILE}
-	@make stop
-	@sleep 3
-	@make start
-
-
-# Удаление Registry
-remove: ${DOCKER} ${COMPOSE_FILE}
-#	@make stop
-	@${DOCKER} rmi registry
-
-
-# Лог Portainer в Docker
-log: ${DOCKER} ${COMPOSE_FILE}
-	@${COMPOSE} -f ${COMPOSE_FILE} logs --follow
+# AMICLIENT DOCKER
+ifneq ("$(wildcard $(PWD_APP)/$(MAKEFILE_DOCKER))","")
+    include ${MAKEFILE_DOCKER}
+endif
 
 # ===========================================================

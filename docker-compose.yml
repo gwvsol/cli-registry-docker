@@ -9,5 +9,8 @@ services:
       - 5000:5000
     volumes:
       - /var/data/registry:/var/lib/registry
+      - ./.htpasswd:/root/.htpasswd
     environment:
       REGISTRY_STORAGE_DELETE_ENABLED: "true"
+      REGISTRY_AUTH_HTPASSWD_REALM: basic-realm
+      REGISTRY_AUTH_HTPASSWD_PATH: /root/.htpasswd

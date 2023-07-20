@@ -1,16 +1,26 @@
 import os
+import click
 import socket
 from enum import Enum
 
-user = os.getenv('REGISTRY_USER', default='kab')
-password = os.getenv('REGISTRY_PASSWORD', default='Let90nc23')
+host: str = os.getenv('REGISTRY_HOST',
+                      default=socket.gethostbyname(
+                          socket.gethostname()))
+click.echo("\n\t\033[96m {}     => {}\033[00m" .format('REGISTRY_HOST', host))
+port: int = int(os.getenv('REGISTRY_PORT', default='5000'))
+click.echo("\t\033[96m {}     => {}\033[00m" .format('REGISTRY_PORT', port))
+user: str = os.getenv('REGISTRY_USER', default='kab')
+click.echo("\t\033[96m {}     => {}\033[00m" .format('REGISTRY_USER', user))
+password: str = os.getenv('REGISTRY_PASSWORD', default='Let90nc23')
+click.echo("\t\033[96m {} => {}\033[00m\n" .format('REGISTRY_PASSWORD',
+                                                   '**********'))
 
 
 class ConfigUrl:
     """ Настройки API REGISTRY """
 
-    host: str = socket.gethostbyname(socket.gethostname())
-    port: int = 5000
+    host: str = host
+    port: int = port
     user: str = user
     passwd: str = password
 

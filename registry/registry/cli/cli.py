@@ -30,7 +30,7 @@ def list(ssl, host, port, user, passwd) -> None:
 @main.command(help=ClickHelp.info)
 @click.option('-h', '--host', default=conf.host, show_default=True,
               required=False, type=str, help=ClickHelp.host)
-@click.option('-p', '--port', default=5000, show_default=True,
+@click.option('-p', '--port', default=conf.port, show_default=True,
               required=False, type=int, help=ClickHelp.port)
 @click.option('-s', '--ssl', default=False, show_default=True,
               required=False, type=bool, help=ClickHelp.ssl)
@@ -50,7 +50,7 @@ def info(ssl, host, port, repo, user, passwd) -> None:
 @main.command(help=ClickHelp.delete)
 @click.option('-h', '--host', default=conf.host, show_default=True,
               required=False, type=str, help=ClickHelp.host)
-@click.option('-p', '--port', default=5000, show_default=True,
+@click.option('-p', '--port', default=conf.port, show_default=True,
               required=False, type=int, help=ClickHelp.port)
 @click.option('-s', '--ssl', default=False, show_default=True,
               required=False, type=bool, help=ClickHelp.ssl)

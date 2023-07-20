@@ -1,4 +1,4 @@
-### Distribution Registry 
+### CLI application for Registry       
 
 [Distribution Registry](https://hub.docker.com/_/registry)      
 [Docker Registry](https://docs.docker.com/registry/)      
@@ -21,12 +21,7 @@
 [Docker Registry API – Listing Images and Tags](https://www.baeldung.com/ops/docker-registry-api-list-images-tags)      
 [How can I use the Docker Registry API V2 to delete an image from a private registry?](https://stackoverflow.com/questions/37033055/how-can-i-use-the-docker-registry-api-v2-to-delete-an-image-from-a-private-regis)      
 [How to Delete Images From a Private Docker Registry](https://azizunsal.github.io/blog/post/delete-images-from-private-docker-registry/)    
-
-```url
-https://techvsolregistry.svc.1ckab.ru   
-user: str = 'kab'   
-passwd: str = 'Let90nc23'  
-```    
+  
 
 ```shell
 curl -s -I -H "Accept: application/vnd.docker.distribution.manifest.v2+json" http://localhost:5000/v2/geoservice/manifests/2022-10-05

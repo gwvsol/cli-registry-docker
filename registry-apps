@@ -1,0 +1,92 @@
+#!/bin/bash
+
+cd $(dirname $0)
+
+if [ -f $(pwd)/registry/.setting ]; then
+
+    . registry/.setting
+
+else
+
+    printf "\033[0m\033[31m\n"
+    echo "====                   REGISTRY-CLI application is missing                   ===="
+    echo "====    The REGISTRY-CLI application does not have an configuration file     ===="
+    printf "\n\033[0m"
+    exit 1
+
+fi
+
+if ! [ -d $(pwd)/$REGISTRY ]; then
+
+    printf "\033[0m\033[31m\n"
+    echo "===                    REGISTRY-CLI application is missing                    ==="
+    printf "\n\033[0m"
+    exit 1
+
+fi
+
+
+if ! [ -f $(pwd)/Makefile ]; then
+
+        printf "\033[0m\033[31m\n"
+        echo "=====         There is no Makefile in the REGISTRY-CLI application          ====="
+        printf "\n\033[0m"
+        exit 1
+
+fi
+
+
+if [[ $@ = install ]]; then
+
+    make install && make install-dev && make install-registry
+
+elif [[ $@ = uninstall ]]; then
+
+    make uninstall
+
+elif [[ $@ = check ]]; then
+
+    make check
+
+elif [[ $@ = release ]]; then
+
+    make release-src
+
+elif [[ $@ = build ]]; then
+
+    make build
+
+else
+
+    if [ -f $(pwd)/$REGISTRY/$REGISTRY_CLI ]; then
+
+        if ! [ -d $(pwd)/venv ]; then
+
+        printf "\033[0m\033[31m\n"
+        echo "=====             The virtual environment directory is missing              ====="
+        printf "\n\033[0m"
+        exit 1
+
+        fi
+
+        if ! [ -f $(pwd)/venv/bin/python ]; then
+
+            printf "\033[0m\033[31m\n"
+            echo "=====                  Python is missing in the virtual environment         ====="
+            printf "\n\033[0m"
+            exit 1
+
+        fi
+
+        $(pwd)/venv/bin/python $REGISTRY/$REGISTRY_CLI $@
+
+    else
+        ls -l $(pwd)/$REGISTRY
+        printf "\033[0m\033[31m\n"
+        echo "===  The REGISTRY-CLI application does not have an application startup file   ==="
+        printf "\n\033[0m"
+        exit 1
+
+    fi
+
+fi

@@ -1,0 +1,52 @@
+#!/bin/bash
+
+# docker run --entrypoint bash --rm -it python:3.10-bullseye
+# docker run --entrypoint bash \
+#            --rm \
+#            -v /var/data/project/work/cdm4000-service:/srv \
+#            --device=/dev/ttyUSB0 \
+#            python:3.10-bullseye
+
+cd $(dirname $0)
+USER_ID=default_user_id
+
+if [ -f $(pwd)/registry/.setting ]; then
+
+    . registry/.setting
+
+else
+
+    printf "\033[0m\033[31m\n"
+    echo "=====                     REGISTRY application is missing                      ====="
+    echo "===== The REGISTRY application does not have an application configuration file ====="
+    printf "\n\033[0m"
+    exit 1
+
+fi
+
+# if [ -f $(pwd)/.env ]; then
+
+#   . .env
+
+# else
+
+#     printf "\033[0m\033[31m\n"
+#     echo "===== The REGISTRY application does not have a file with the application settings ====="
+#     printf "\n\033[0m"
+#     exit 1
+
+# fi
+
+if [ -f $(pwd)/Makefile ]; then
+
+    make build-apps
+    chown -R ${USER_ID}:${USER_ID} ./*
+
+else
+
+    printf "\033[0m\033[31m\n"
+    echo "===== The REGISTRY application does not have an application build script ====="
+    printf "\n\033[0m"
+    exit 1
+
+fi

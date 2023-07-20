@@ -50,13 +50,18 @@ def registry_requests(method: str, url: str,
 
 
 def check_scheme(ssl: bool, host: str, port: int) -> tuple:
+
+    ssl = True if port == 443 else ssl
+
     scheme = "https" if ssl else "http"
+
     if ssl and port == 443:
         netloc = host
     elif not ssl and port == 80:
         netloc = host
     else:
         netloc = f"{host}:{port}"
+
     return scheme, netloc
 
 
@@ -82,19 +87,19 @@ def repo_list(ssl: bool, host: str, port: int,
     color: Color = Color.Turquoise4
     repositories: list = data.get('repositories', list())
     if status_code != requests.codes['ok']:
-        click.echo("\t\t\033[38;5;{}m status => {}\033[0;0m" .format(
+        click.echo("\t\t\033[38;5;{}m status => {}\033[0;0m".format(
             color.value, status_code)
             )
     if log:
-        click.echo("\t\t\033[38;5;{}m repositories =>\033[0;0m" .format(
+        click.echo("\n\t\t\033[38;5;{}m repositories =>\033[0;0m\n".format(
             color.value)
             )
         color: Color = Color.Green
         for repository in repositories:
-            click.echo("\t\t\t\033[38;5;{}m {}\033[0;0m" .format(
+            click.echo("\t\t\t\033[38;5;{}m {}\033[0;0m".format(
                 color.value, repository)
                 )
-
+    click.echo("")
     return repositories
 
 
@@ -134,9 +139,9 @@ def repos_info(ssl: bool, host: str, port: int,
                repo: str, user: str, passwd: str):
     """ Информация репозиториев  """
     color: Color = Color.Turquoise4
-    click.echo("\t\t\033[38;5;{}m images =>\033[0;0m" .format(
-        color.value)
-        )
+    click.echo("\n\t\t\033[38;5;{}m images =>\033[0;0m" .format(
+        color.value))
+
     if repo == '':
         repositories = repo_list(ssl, host, port, user, passwd, log=False)
         if len(repositories) > 0:
@@ -144,6 +149,7 @@ def repos_info(ssl: bool, host: str, port: int,
                 repo_info(ssl, host, port, repository, user, passwd)
     else:
         repo_info(ssl, host, port, repo, user, passwd)
+    click.echo("")
 
 
 def img_del(ssl: bool, host: str,
@@ -204,3 +210,4 @@ def img_del(ssl: bool, host: str,
         click.echo("\t\t\033[38;5;{}m etag => {}\033[0;0m" .format(
             color.value, info)
             )
+    click.echo("")

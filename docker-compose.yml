@@ -2,14 +2,14 @@ version: "3"
 
 services:
   registry:
-    image: registry
-    container_name: registry
+    image: registry:2.8
+    container_name: registry-srv
     restart: always
     ports:
       - 5000:5000
     volumes:
       - /var/data/registry:/var/lib/registry
-      - ./.htpasswd:/root/.htpasswd
+      - ./registry/.htpasswd:/root/.htpasswd
     environment:
       REGISTRY_STORAGE_DELETE_ENABLED: "true"
       REGISTRY_AUTH_HTPASSWD_REALM: basic-realm

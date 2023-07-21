@@ -6,7 +6,7 @@ dnf install httpd-tools # для Fedora, CentOs
 apt install apache2-utils # для Debian
 
 # Создание файла .htpasswd для Registry
-htpasswd -c /home/work/.htpasswd bob123
+htpasswd -cB /home/work/.htpasswd username
 
 ```
 

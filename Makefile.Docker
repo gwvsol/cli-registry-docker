@@ -1,21 +1,17 @@
-export REGISTRY=registry
-export DOCKER=docker
-export COMPOSE=docker-compose
-export DOCKERFILE=Dockerfile
-export COMPOSEFILE=docker-compose.yml
-export RELEASE_IMAGE=latest
+# ===========================================================
 
-# =============================================
+# export DOCKER=docker
+# export COMPOSEFILE=docker-compose.yml
+
+# ===========================================================
 
 # Старт REGISTRY
 start: ${COMPOSEFILE}
-	@${COMPOSE} -f ${COMPOSEFILE} up -d
-
+	@${DOCKER} compose -f ${COMPOSEFILE} up -d
 
 # Стop REGISTRY
 stop: ${COMPOSEFILE}
-	@${COMPOSE} -f ${COMPOSEFILE} down
-
+	@${DOCKER} compose -f ${COMPOSEFILE} down
 
 # Рестарт REGISTRY
 restart: ${COMPOSEFILE}
@@ -23,15 +19,13 @@ restart: ${COMPOSEFILE}
 	@sleep 3
 	@make start
 
-
-# Удаление REGISTRY
-remove:
-#	@make stop
-	@${DOCKER} rmi registry
-
+## Удаление REGISTRY
+#remove:
+##	@make stop
+#	@${DOCKER} rmi registry
 
 # Лог REGISTRY
 log: ${COMPOSEFILE}
-	@${COMPOSE} -f ${COMPOSEFILE} logs --follow
+	@${DOCKER} compose -f ${COMPOSEFILE} logs --follow
 
 # ===========================================================
